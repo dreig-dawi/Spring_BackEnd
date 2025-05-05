@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/messages")
+@RequestMapping("/messages")
 public class MessageController {
     private final MessageRepository repository;
 
@@ -16,18 +16,23 @@ public class MessageController {
         this.repository = repository;
     }
 
-    @GetMapping
+    @GetMapping()
     public List<Message> getAllMessages() {
         return repository.findAll();
     }
 
+    @GetMapping("/{id}")
+    public Message getMessageById(@PathVariable Long id) {
+        return repository.findById(id).orElse(null);
+    }
+
     @PostMapping
     public Response createMessage(@RequestBody Message message) {
-        if (message.getContent() != null) {
+        if (message.getMessage() != null) {
             repository.save(message);
             return new Response(
                     0,
-                    message.getContent()
+                    message.getMessage()
             );
         } else {
             return new Response(
@@ -41,7 +46,7 @@ public class MessageController {
     public Message updateMessage(@PathVariable Long id, @RequestBody Message newMessage) {
         return repository.findById(id)
                 .map(message -> {
-                    message.setContent(newMessage.getContent());
+                    message.setMessages(newMessage.getMessage());
                     return repository.save(message);
                 })
                 .orElseGet(() -> repository.save(newMessage));

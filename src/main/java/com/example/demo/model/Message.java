@@ -1,25 +1,24 @@
 package com.example.demo.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
-@Entity
+@Entity(name = "teste")
 public class Message {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String content;
+
+    @Column(name = "message")
+    private String message;
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessages(String message) {
+        this.message = message;
+    }
 
     public Long getId() {
         return id;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-}
+    }}
