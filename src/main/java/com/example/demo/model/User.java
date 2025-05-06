@@ -4,8 +4,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import org.hibernate.annotations.JdbcType;
-import org.springframework.context.annotation.Primary;
 
 @Entity
 @Table(name = "user", schema = "public")
@@ -45,10 +43,10 @@ public class User {
     }
 
     public String toString() {
-        return "User{" +
-                "email='" + email + '\'' +
-                ", username='" + username + '\'' +
-                ", passwordHash='" + passwordHash + '\'' +
-                '}';
+        return "{" +
+                "\"email\":\"" + email + "\"," +
+                "\"username\":\"" + username + "\"," +
+                "\"passwordHash\":\"" + passwordHash + "\"" +
+                "}";
     }
 }

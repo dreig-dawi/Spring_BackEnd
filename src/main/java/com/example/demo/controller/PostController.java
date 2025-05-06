@@ -5,10 +5,8 @@ import com.example.demo.model.Response;
 import com.example.demo.model.User;
 import com.example.demo.repository.PostRepository;
 import com.example.demo.repository.UserRepository;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -23,7 +21,6 @@ public class PostController {
     }
 
     @GetMapping
-    @Query(value = "SELECT * FROM post ORDER BY RANDOM() LIMIT 10", nativeQuery = true)
     public List<Post> getPosts() {
         return repository.getPosts();
     }
@@ -39,7 +36,6 @@ public class PostController {
                 return new Response(1, "User with email " + post.getUserEmail() + " not found");
             }
             post.setUser(user);
-//            repository.createPost(post.getId(), post.getDescription(), LocalDateTime.now().toString(), post.getUserEmail());
             repository.save(post);
             return new Response(
                     0,

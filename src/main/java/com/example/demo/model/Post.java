@@ -1,10 +1,10 @@
 package com.example.demo.model;
 
-    import jakarta.persistence.*;
-    import com.fasterxml.jackson.annotation.JsonProperty;
-    import org.hibernate.annotations.CreationTimestamp;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
 
-    import java.sql.Timestamp;
+import java.sql.Timestamp;
 
 @Entity
     @Table(name = "post", schema = "public")
@@ -12,7 +12,7 @@ package com.example.demo.model;
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         @Column(name = "id")
-        private String id;
+        private int id;
 
         @Column(name = "description")
         private String description;
@@ -29,7 +29,7 @@ package com.example.demo.model;
         @JoinColumn(name = "username", referencedColumnName = "username")
         private User user;
 
-        public String getId() {
+        public int getId() {
             return id;
         }
 
@@ -67,12 +67,12 @@ package com.example.demo.model;
 
         @Override
         public String toString() {
-            return "Post{" +
-                    "id='" + id + '\'' +
-                    ", description='" + description + '\'' +
-                    ", createdAt='" + createdAt + '\'' +
-                    ", userEmail='" + userEmail + '\'' +
-                    ", user=" + user +
-                    '}';
+            return "{" +
+                    "\"id\":" + id + "," +
+                    "\"description\":\"" + description + "\"," +
+                    "\"createdAt\":\"" + createdAt + "\"," +
+                    "\"userEmail\":\"" + (userEmail != null ? userEmail : "") + "\"," +
+                    "\"user\":" + (user != null ? "\"" + user.getUsername() + "\"" : "null") +
+                    "}";
         }
     }
