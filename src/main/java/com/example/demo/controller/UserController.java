@@ -22,13 +22,12 @@ public class UserController {
     }
     
     @GetMapping("/{id}")
-    public User getUserById(@RequestBody Long id) {
-        return repository.findById(id).orElse(null);
+    public User getUserById(@PathVariable String id) {
+        return repository.findUserById(id);
     }
     
     @PostMapping
     public Response createUser(@RequestBody User user) {
-        System.out.println(user.toString());
         if (
                 user.getUsername() != null &&
                 user.getEmail() != null &&

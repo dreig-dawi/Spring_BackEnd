@@ -13,6 +13,31 @@ public class Content {
     private String data;
 
     @ManyToOne
-    @JoinColumn(name = "id", referencedColumnName = "post_id")
+    @JoinColumn(name = "post_id", referencedColumnName = "id")
     private Post postId;
+
+    public String getId() {
+            return id;
+        }
+
+        public void setId(String id) {
+            this.id = id;
+        }
+
+        public String getData() {
+            return data;
+        }
+
+        public void setData(String data) {
+            this.data = data;
+        }
+
+        @Override
+        public String toString() {
+            return "Content{" +
+                    "id='" + id + '\'' +
+                    ", data='" + data + '\'' +
+                    ", postId=" + postId +
+                    '}';
+        }
 }
