@@ -25,10 +25,10 @@ public class PostController {
     @GetMapping
     public List<PostResponse> getPosts() {
         List<Post> posts = repository.getPosts();
-        List<PostResponse> postResponses = new ArrayList<>();
+        List<PostResponse> postResponse = new ArrayList<>();
 
         posts.forEach(post -> {
-            postResponses.add(new PostResponse(
+            postResponse.add(new PostResponse(
                     post.getId(),
                     post.getDescription(),
                     post.getCreatedAt(),
@@ -36,7 +36,7 @@ public class PostController {
             ));
         });
 
-        return postResponses;
+        return postResponse;
     }
 
     @PostMapping

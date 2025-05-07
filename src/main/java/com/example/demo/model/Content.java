@@ -8,7 +8,7 @@ import jakarta.persistence.*;
 public class Content {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private String id;
+    private int id;
 
     @Column(name = "data")
     private String data;
@@ -21,11 +21,11 @@ public class Content {
     @JoinColumn(name = "post_id", referencedColumnName = "id")
     private Post postId;
 
-    public String getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(int id) {
         this.id = id;
     }
 

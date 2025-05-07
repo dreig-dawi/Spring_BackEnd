@@ -1,12 +1,14 @@
 package com.example.demo.controller;
 
 import com.example.demo.model.Content;
+import com.example.demo.model.ContentResponse;
 import com.example.demo.model.Post;
 import com.example.demo.model.Response;
 import com.example.demo.repository.ContentRepository;
 import com.example.demo.repository.PostRepository;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -26,15 +28,19 @@ public class ContentController {
     }
 
     @GetMapping("/{id}")
-    public Response getContentById(@PathVariable int id) {
+    public List<ContentResponse> getContentById(@PathVariable int id) {
         List<Content> contents = contentRepository.findContentById(id);
-        System.out.println(contents);
-        String result = contents.toString();
-        System.out.println(result);
-        return new Response(
-                0,
-                result
-        );
+        List<ContentResponse> contentResponse = new ArrayList<>();
+
+        contents.forEach(content -> {
+            contentResponse.add(new ContentResponse(
+                    content.getId(),
+                    content.getPostId().getId(),
+                    content.getData()
+            ));
+        });
+
+        return contentResponse;
     }
 
     @PostMapping
