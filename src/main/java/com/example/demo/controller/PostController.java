@@ -1,12 +1,14 @@
 package com.example.demo.controller;
 
 import com.example.demo.model.Post;
+import com.example.demo.model.PostResponse;
 import com.example.demo.model.Response;
 import com.example.demo.model.User;
 import com.example.demo.repository.PostRepository;
 import com.example.demo.repository.UserRepository;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -21,8 +23,20 @@ public class PostController {
     }
 
     @GetMapping
-    public List<Post> getPosts() {
-        return repository.getPosts();
+    public List<PostResponse> getPosts() {
+        List<Post> posts = repository.getPosts();
+        List<PostResponse> postResponses = new ArrayList<>();
+
+        posts.forEach(post -> {
+            postResponses.add(new PostResponse(
+                    post.getId(),
+                    post.getDescription(),
+                    post.getCreatedAt(),
+                    post.getUser().getUsername()
+            ));
+        });
+
+        return postResponses;
     }
 
     @PostMapping
