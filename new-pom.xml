@@ -76,11 +76,11 @@
     </dependencies>
     
     <build>
-        <plugins>
-            <plugin>
+        <plugins>            <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
+                    <mainClass>com.example.cheffin.CheffinApplication</mainClass>
                     <excludes>
                         <exclude>
                             <groupId>org.projectlombok</groupId>

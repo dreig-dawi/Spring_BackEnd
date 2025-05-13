@@ -36,6 +36,8 @@ FROM deps as package
 WORKDIR /build
 
 COPY ./src src/
+# Remove the demo package to avoid conflicts
+RUN rm -rf src/main/java/com/example/demo/
 RUN --mount=type=bind,source=pom.xml,target=pom.xml \
     --mount=type=cache,target=/root/.m2 \
     ./mvnw clean package -DskipTests && \
