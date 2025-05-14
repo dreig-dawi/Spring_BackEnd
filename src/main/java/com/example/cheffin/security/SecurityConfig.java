@@ -26,12 +26,10 @@ public class SecurityConfig {
     public SecurityConfig(@Lazy JwtRequestFilter jwtRequestFilter, JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint) {
         this.jwtRequestFilter = jwtRequestFilter;
         this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
-    }
-
-    @Bean
+    }    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .cors().and()
+            .cors().configurationSource(corsConfigurationSource()).and()
             .csrf().disable()
             .authorizeHttpRequests(requests -> requests
                 .requestMatchers("/users/login", "/users/register", "/users/register/chef", 
@@ -48,15 +46,10 @@ public class SecurityConfig {
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
-    }
-      @Bean
+    }    @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList(
-            "http://localhost:3000", 
-            "https://cheffin.es", 
-            "https://www.cheffin.es"
-        ));
+        configuration.setAllowedOrigins(Arrays.asList("*"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(Arrays.asList(
             "Authorization", 
