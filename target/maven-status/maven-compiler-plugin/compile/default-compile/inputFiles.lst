@@ -3,6 +3,7 @@ C:\Users\darii\Desktop\FP24-25\Proyecto\Spring_BackEnd\Spring_BackEnd\src\main\j
 C:\Users\darii\Desktop\FP24-25\Proyecto\Spring_BackEnd\Spring_BackEnd\src\main\java\com\example\cheffin\model\ChatMessage.java
 C:\Users\darii\Desktop\FP24-25\Proyecto\Spring_BackEnd\Spring_BackEnd\src\main\java\com\example\cheffin\repository\UserRepository.java
 C:\Users\darii\Desktop\FP24-25\Proyecto\Spring_BackEnd\Spring_BackEnd\src\main\java\com\example\cheffin\model\User.java
+C:\Users\darii\Desktop\FP24-25\Proyecto\Spring_BackEnd\Spring_BackEnd\src\main\java\com\example\cheffin\config\WebConfig.java
 C:\Users\darii\Desktop\FP24-25\Proyecto\Spring_BackEnd\Spring_BackEnd\src\main\java\com\example\cheffin\controller\PostController.java
 C:\Users\darii\Desktop\FP24-25\Proyecto\Spring_BackEnd\Spring_BackEnd\src\main\java\com\example\cheffin\security\JwtAuthenticationEntryPoint.java
 C:\Users\darii\Desktop\FP24-25\Proyecto\Spring_BackEnd\Spring_BackEnd\src\main\java\com\example\cheffin\dto\AuthResponseDTO.java

@@ -43,3 +43,4 @@ com\example\cheffin\websocket\ChatSocketController.class
 com\example\cheffin\service\PostService.class
 com\example\cheffin\dto\LoginDTO$LoginDTOBuilder.class
 com\example\cheffin\security\JwtAuthenticationEntryPoint.class
+com\example\cheffin\config\WebConfig.class
