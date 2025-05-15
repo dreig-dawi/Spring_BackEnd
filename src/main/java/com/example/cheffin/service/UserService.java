@@ -79,9 +79,10 @@ public class UserService implements UserDetailsService {
                 .build();
 
         if (isChef) {
-            user.setSpecialty(registerDTO.getSpecialty());
-            user.setBio(registerDTO.getBio());
-            user.setExperience(registerDTO.getExperience());
+            // Add null checks for chef-specific fields
+            user.setSpecialty(registerDTO.getSpecialty() != null ? registerDTO.getSpecialty() : "");
+            user.setBio(registerDTO.getBio() != null ? registerDTO.getBio() : "");
+            user.setExperience(registerDTO.getExperience() != null ? registerDTO.getExperience() : 0);
         }
 
         return userRepository.save(user);

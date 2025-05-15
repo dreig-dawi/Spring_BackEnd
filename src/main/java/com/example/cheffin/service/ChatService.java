@@ -46,21 +46,28 @@ public class ChatService {
         
         List<ConversationDTO> conversations = new ArrayList<>();
         
-        for (User participant : participants) {
-            List<ChatMessage> messages = chatMessageRepository.findConversation(currentUser, participant);
-            
-            if (!messages.isEmpty()) {
-                // Get the most recent message
-                ChatMessage lastMessage = messages.get(messages.size() - 1);
-                
-                ConversationDTO conversation = ConversationDTO.builder()
-                        .participantId(participant.getId())
-                        .username(participant.getUsername())
-                        .lastMessage(lastMessage.getContent())
-                        .timestamp(lastMessage.getTimestamp())
-                        .build();
-                
-                conversations.add(conversation);
+        // Check if participants list is not null
+        if (participants != null && !participants.isEmpty()) {
+            for (User participant : participants) {
+                // Make sure participant is not null
+                if (participant != null) {
+                    List<ChatMessage> messages = chatMessageRepository.findConversation(currentUser, participant);
+                    
+                    // Check if messages exist and list is not empty
+                    if (messages != null && !messages.isEmpty()) {
+                        // Get the most recent message
+                        ChatMessage lastMessage = messages.get(messages.size() - 1);
+                        
+                        ConversationDTO conversation = ConversationDTO.builder()
+                                .participantId(participant.getId())
+                                .username(participant.getUsername())
+                                .lastMessage(lastMessage.getContent())
+                                .timestamp(lastMessage.getTimestamp())
+                                .build();
+                        
+                        conversations.add(conversation);
+                    }
+                }
             }
         }
         
