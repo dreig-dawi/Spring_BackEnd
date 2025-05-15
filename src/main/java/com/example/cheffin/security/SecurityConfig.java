@@ -30,10 +30,10 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .cors().configurationSource(corsConfigurationSource()).and()
-            .csrf().disable()
-            .authorizeHttpRequests(requests -> requests
+            .csrf().disable()            .authorizeHttpRequests(requests -> requests
                 .requestMatchers("/users/login", "/users/register", "/users/register/chef", 
-                                 "/users/profile/*", "/users/chefs/featured", "/post", "/error",
+                                 "/users/profile/*", "/users/chef/*", "/users/chefs/featured", 
+                                 "/post", "/post/user/*", "/post/search", "/error",
                                  "/api/test/**")
                 .permitAll()
                 .anyRequest().authenticated())

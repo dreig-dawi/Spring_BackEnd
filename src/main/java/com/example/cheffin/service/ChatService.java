@@ -28,12 +28,17 @@ public class ChatService {
         List<ChatMessage> messages = chatMessageRepository.findConversation(currentUser, participant);
         
         // Mark messages as read if they were sent to the current user
-        messages.forEach(msg -> {
-            if (msg.getRecipient().getId().equals(currentUser.getId()) && !msg.isRead()) {
-                msg.setRead(true);
-                chatMessageRepository.save(msg);
-            }
-        });
+        if (messages != null && !messages.isEmpty()) {
+            messages.forEach(msg -> {
+                if (msg.getRecipient().getId().equals(currentUser.getId()) && !msg.isRead()) {
+                    msg.setRead(true);
+                    chatMessageRepository.save(msg);
+                }
+            });
+        } else {
+            // Return empty list if no messages found
+            return new ArrayList<>();
+        }
 
         return messages.stream()
                 .map(ChatMessageDTO::fromEntity)

@@ -56,10 +56,13 @@ public class UserController {
     @GetMapping("/chefs/featured")
     public ResponseEntity<List<UserDTO>> getFeaturedChefs() {
         return ResponseEntity.ok(userService.getFeaturedChefs());
-    }
-
-    @GetMapping("/chefs")
+    }    @GetMapping("/chefs")
     public ResponseEntity<List<UserDTO>> getAllChefs() {
         return ResponseEntity.ok(userService.getAllChefs());
+    }
+    
+    @GetMapping("/chef/{username}")
+    public ResponseEntity<UserDTO> getChefProfile(@PathVariable String username) {
+        return ResponseEntity.ok(userService.getUserProfile(username));
     }
 }
