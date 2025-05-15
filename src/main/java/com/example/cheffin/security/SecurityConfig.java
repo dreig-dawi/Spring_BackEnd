@@ -32,10 +32,12 @@ public class SecurityConfig {
             .cors().configurationSource(corsConfigurationSource()).and()
             .csrf().disable()            .authorizeHttpRequests(requests -> requests
                 .requestMatchers("/users/login", "/users/register", "/users/register/chef", 
-                                 "/users/profile/*", "/users/chef/*", "/users/chefs/featured", 
+                                 "/users/profile/*", "/users/chef/*", "/users/chefs/featured", "/users/chefs",
                                  "/post", "/post/user/*", "/post/search", "/error",
                                  "/api/test/**")
                 .permitAll()
+                // Ensure authenticated access to chat endpoints
+                .requestMatchers("/chat/**").authenticated()
                 .anyRequest().authenticated())
             .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);

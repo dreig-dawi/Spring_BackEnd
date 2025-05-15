@@ -19,61 +19,110 @@ import java.util.stream.Collectors;
 public class ChatService {
 
     private final ChatMessageRepository chatMessageRepository;
-    private final UserService userService;
+    private final UserService userService;    public List<ChatMessageDTO> getConversation(String username, Long participantId) {
+        try {
+            User currentUser = userService.findByUsername(username);
+            if (currentUser == null) {
+                return new ArrayList<>();
+            }
+            
+            User participant;
+            try {
+                participant = userService.findById(participantId);
+            } catch (Exception e) {
+                return new ArrayList<>();
+            }
+            
+            if (participant == null) {
+                return new ArrayList<>();
+            }
 
-    public List<ChatMessageDTO> getConversation(String username, Long participantId) {
-        User currentUser = userService.findByUsername(username);
-        User participant = userService.findById(participantId);
+            List<ChatMessage> messages;
+            try {
+                messages = chatMessageRepository.findConversation(currentUser, participant);
+            } catch (Exception e) {
+                return new ArrayList<>();
+            }
+            
+            // Mark messages as read if they were sent to the current user
+            if (messages != null && !messages.isEmpty()) {
+                messages.forEach(msg -> {
+                    if (msg.getRecipient().getId().equals(currentUser.getId()) && !msg.isRead()) {
+                        msg.setRead(true);
+                        chatMessageRepository.save(msg);
+                    }
+                });
+            } else {
+                // Return empty list if no messages found
+                return new ArrayList<>();
+            }
 
-        List<ChatMessage> messages = chatMessageRepository.findConversation(currentUser, participant);
-        
-        // Mark messages as read if they were sent to the current user
-        if (messages != null && !messages.isEmpty()) {
-            messages.forEach(msg -> {
-                if (msg.getRecipient().getId().equals(currentUser.getId()) && !msg.isRead()) {
-                    msg.setRead(true);
-                    chatMessageRepository.save(msg);
-                }
-            });
-        } else {
-            // Return empty list if no messages found
+            return messages.stream()
+                    .map(ChatMessageDTO::fromEntity)
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            // Return empty list for any unexpected error
             return new ArrayList<>();
         }
-
-        return messages.stream()
-                .map(ChatMessageDTO::fromEntity)
-                .collect(Collectors.toList());
     }
 
     public List<ConversationDTO> getConversations(String username) {
-        User currentUser = userService.findByUsername(username);
-        List<User> participants = chatMessageRepository.findConversationParticipants(currentUser);
-        
         List<ConversationDTO> conversations = new ArrayList<>();
         
-        // Check if participants list is not null
-        if (participants != null && !participants.isEmpty()) {
-            for (User participant : participants) {
-                // Make sure participant is not null
-                if (participant != null) {
-                    List<ChatMessage> messages = chatMessageRepository.findConversation(currentUser, participant);
+        try {
+            // Find the current user
+            User currentUser = userService.findByUsername(username);
+            if (currentUser == null) {
+                return new ArrayList<>(); // Return empty list if user not found
+            }
+            
+            // Find participants
+            List<User> participants;
+            try {
+                participants = chatMessageRepository.findConversationParticipants(currentUser);
+            } catch (Exception e) {
+                // If there's any error with the query, just return an empty list
+                return new ArrayList<>();
+            }
+            
+            // Initialize conversations list
+            
+            // Process only if we have participants
+            if (participants != null && !participants.isEmpty()) {
+                for (User participant : participants) {
+                    // Skip null participants
+                    if (participant == null) {
+                        continue;
+                    }
                     
-                    // Check if messages exist and list is not empty
-                    if (messages != null && !messages.isEmpty()) {
-                        // Get the most recent message
-                        ChatMessage lastMessage = messages.get(messages.size() - 1);
+                    try {
+                        // Find conversation messages
+                        List<ChatMessage> messages = chatMessageRepository.findConversation(currentUser, participant);
                         
-                        ConversationDTO conversation = ConversationDTO.builder()
-                                .participantId(participant.getId())
-                                .username(participant.getUsername())
-                                .lastMessage(lastMessage.getContent())
-                                .timestamp(lastMessage.getTimestamp())
-                                .build();
-                        
-                        conversations.add(conversation);
+                        // Only process if we have messages
+                        if (messages != null && !messages.isEmpty()) {
+                            // Get the most recent message safely
+                            ChatMessage lastMessage = messages.get(messages.size() - 1);
+                            
+                            // Create conversation DTO with null checks
+                            ConversationDTO conversation = ConversationDTO.builder()
+                                    .participantId(participant.getId())
+                                    .username(participant.getUsername())
+                                    .lastMessage(lastMessage.getContent() != null ? lastMessage.getContent() : "")
+                                    .timestamp(lastMessage.getTimestamp() != null ? lastMessage.getTimestamp() : LocalDateTime.now())
+                                    .build();
+                            
+                            conversations.add(conversation);
+                        }
+                    } catch (Exception e) {
+                        // If we have an issue with one conversation, skip it but don't fail the entire request
+                        continue;
                     }
                 }
             }
+        } catch (Exception e) {
+            // Catch any unexpected errors and return an empty list instead of throwing 500
+            return new ArrayList<>();
         }
         
         return conversations;
@@ -93,12 +142,28 @@ public class ChatService {
 
         ChatMessage savedMessage = chatMessageRepository.save(message);
         return ChatMessageDTO.fromEntity(savedMessage);
-    }
-
-    public List<ChatMessageDTO> getUnreadMessages(String username) {
-        User user = userService.findByUsername(username);
-        return chatMessageRepository.findUnreadMessages(user).stream()
-                .map(ChatMessageDTO::fromEntity)
-                .collect(Collectors.toList());
+    }    public List<ChatMessageDTO> getUnreadMessages(String username) {
+        try {
+            User user = userService.findByUsername(username);
+            if (user == null) {
+                return new ArrayList<>();
+            }
+            
+            List<ChatMessage> unreadMessages;
+            try {
+                unreadMessages = chatMessageRepository.findUnreadMessages(user);
+                if (unreadMessages == null) {
+                    return new ArrayList<>();
+                }
+            } catch (Exception e) {
+                return new ArrayList<>();
+            }
+            
+            return unreadMessages.stream()
+                    .map(ChatMessageDTO::fromEntity)
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
     }
 }
