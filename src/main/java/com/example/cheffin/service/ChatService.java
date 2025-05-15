@@ -126,23 +126,41 @@ public class ChatService {
         }
         
         return conversations;
-    }
+    }    public ChatMessageDTO saveMessage(String senderUsername, String recipientUsername, String content) {
+        try {
+            User sender = userService.findByUsername(senderUsername);
+            if (sender == null) {
+                throw new ResourceNotFoundException("Sender not found: " + senderUsername);
+            }
+            
+            User recipient = userService.findByUsername(recipientUsername);
+            if (recipient == null) {
+                throw new ResourceNotFoundException("Recipient not found: " + recipientUsername);
+            }
+            
+            if (content == null || content.trim().isEmpty()) {
+                throw new IllegalArgumentException("Message content cannot be empty");
+            }
 
-    public ChatMessageDTO saveMessage(String senderUsername, String recipientUsername, String content) {
-        User sender = userService.findByUsername(senderUsername);
-        User recipient = userService.findByUsername(recipientUsername);
+            ChatMessage message = ChatMessage.builder()
+                    .sender(sender)
+                    .recipient(recipient)
+                    .content(content)
+                    .timestamp(LocalDateTime.now())
+                    .read(false)
+                    .build();
 
-        ChatMessage message = ChatMessage.builder()
-                .sender(sender)
-                .recipient(recipient)
-                .content(content)
-                .timestamp(LocalDateTime.now())
-                .read(false)
-                .build();
-
-        ChatMessage savedMessage = chatMessageRepository.save(message);
-        return ChatMessageDTO.fromEntity(savedMessage);
-    }    public List<ChatMessageDTO> getUnreadMessages(String username) {
+            ChatMessage savedMessage = chatMessageRepository.save(message);
+            if (savedMessage == null || savedMessage.getId() == null) {
+                throw new RuntimeException("Failed to save message");
+            }
+            
+            return ChatMessageDTO.fromEntity(savedMessage);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e; // Re-throw to be handled by controller or WebSocket error handler
+        }
+    }public List<ChatMessageDTO> getUnreadMessages(String username) {
         try {
             User user = userService.findByUsername(username);
             if (user == null) {

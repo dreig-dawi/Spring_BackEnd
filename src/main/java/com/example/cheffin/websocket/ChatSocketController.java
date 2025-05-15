@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 
@@ -20,27 +21,51 @@ public class ChatSocketController {
 
     @MessageMapping("/send_message")
     public void processMessage(@Payload ChatMessageRequest chatMessageRequest, Principal principal) {
-        String senderUsername = principal.getName();
-        
-        // Save the message to database
-        ChatMessageDTO message = chatService.saveMessage(
-                senderUsername, 
-                chatMessageRequest.getRecipientUsername(),
-                chatMessageRequest.getContent()
-        );
-        
-        // Send the message to the recipient
+        try {
+            String senderUsername = principal.getName();
+            
+            // Validate request
+            if (chatMessageRequest == null || 
+                chatMessageRequest.getRecipientUsername() == null || 
+                chatMessageRequest.getContent() == null) {
+                sendErrorToUser(senderUsername, "Invalid message format");
+                return;
+            }
+            
+            // Save the message to database
+            ChatMessageDTO message = chatService.saveMessage(
+                    senderUsername, 
+                    chatMessageRequest.getRecipientUsername(),
+                    chatMessageRequest.getContent()
+            );
+            
+            // Send the message to the recipient
+            messagingTemplate.convertAndSendToUser(
+                    chatMessageRequest.getRecipientUsername(),
+                    "/queue/messages",
+                    message
+            );
+            
+            // Send a copy to the sender as well
+            messagingTemplate.convertAndSendToUser(
+                    senderUsername,
+                    "/queue/messages",
+                    message
+            );
+        } catch (Exception e) {
+            e.printStackTrace();
+            // Send error message to sender
+            if (principal != null) {
+                sendErrorToUser(principal.getName(), "Error processing message: " + e.getMessage());
+            }
+        }
+    }
+    
+    private void sendErrorToUser(String username, String errorMessage) {
         messagingTemplate.convertAndSendToUser(
-                chatMessageRequest.getRecipientUsername(),
-                "/queue/messages",
-                message
-        );
-        
-        // Send a copy to the sender as well
-        messagingTemplate.convertAndSendToUser(
-                senderUsername,
-                "/queue/messages",
-                message
+                username,
+                "/queue/errors",
+                errorMessage
         );
     }
     
