@@ -33,7 +33,9 @@ public class SecurityConfig {
             .csrf().disable()
             .authorizeHttpRequests(requests -> requests
                 .requestMatchers("/users/login", "/users/register", "/users/register/chef", 
-                                 "/users/profile/*", "/users/chefs/featured", "/post").permitAll()
+                                 "/users/profile/*", "/users/chefs/featured", "/post", "/error",
+                                 "/api/test/**")
+                .permitAll()
                 .anyRequest().authenticated())
             .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
@@ -67,7 +69,8 @@ public class SecurityConfig {
             "Access-Control-Allow-Origin", 
             "Access-Control-Allow-Credentials"
         ));
-        configuration.setAllowCredentials(true);
+        // When using "*" for allowed origins, credentials must be false
+        configuration.setAllowCredentials(false); 
         configuration.setMaxAge(3600L);
         
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

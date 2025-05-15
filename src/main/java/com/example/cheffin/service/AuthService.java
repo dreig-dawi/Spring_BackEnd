@@ -21,29 +21,28 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final UserService userService;
     private final JwtTokenUtil jwtTokenUtil;
-    private final UserRepository userRepository;
-
-    public AuthResponseDTO login(LoginDTO loginDTO) {
+    private final UserRepository userRepository;    public AuthResponseDTO login(LoginDTO loginDTO) {
         try {
+            // Find user by email first
+            User user = userRepository.findByEmail(loginDTO.getEmail())
+                    .orElseThrow(() -> new BadCredentialsException("Invalid email or password"));
+            
+            // Then authenticate using the found username and provided password
             authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(loginDTO.getEmail(), loginDTO.getPassword())
+                    new UsernamePasswordAuthenticationToken(user.getUsername(), loginDTO.getPassword())
             );
+            
+            // Generate JWT token
+            UserDetails userDetails = userService.loadUserByUsername(user.getUsername());
+            String token = jwtTokenUtil.generateToken(userDetails);
+
+            return AuthResponseDTO.builder()
+                    .token(token)
+                    .user(UserDTO.fromEntity(user))
+                    .build();
         } catch (BadCredentialsException e) {
             throw new BadCredentialsException("Invalid email or password");
         }
-
-        // Find user by email
-        User user = userRepository.findByEmail(loginDTO.getEmail())
-                .orElseThrow(() -> new BadCredentialsException("Invalid email or password"));
-
-        // Generate JWT token
-        UserDetails userDetails = userService.loadUserByUsername(user.getUsername());
-        String token = jwtTokenUtil.generateToken(userDetails);
-
-        return AuthResponseDTO.builder()
-                .token(token)
-                .user(UserDTO.fromEntity(user))
-                .build();
     }
 
     public AuthResponseDTO register(RegisterDTO registerDTO, boolean isChef) {

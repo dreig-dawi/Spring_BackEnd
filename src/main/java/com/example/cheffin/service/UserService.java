@@ -21,12 +21,23 @@ import java.util.stream.Collectors;
 public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
-
-    @Override
+    private final PasswordEncoder passwordEncoder;    @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
+        User user;
+        
+        // Try to find by username first
+        if (userRepository.existsByUsername(username)) {
+            user = userRepository.findByUsername(username)
+                    .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
+        } 
+        // If not found by username, try email
+        else if (userRepository.existsByEmail(username)) {
+            user = userRepository.findByEmail(username)
+                    .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + username));
+        } 
+        else {
+            throw new UsernameNotFoundException("User not found with username or email: " + username);
+        }
 
         return new org.springframework.security.core.userdetails.User(
                 user.getUsername(),

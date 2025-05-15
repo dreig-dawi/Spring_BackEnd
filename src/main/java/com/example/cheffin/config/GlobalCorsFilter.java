@@ -15,14 +15,14 @@ import java.io.IOException;
  */
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE)
-public class GlobalCorsFilter implements Filter {
-
-    @Override
+public class GlobalCorsFilter implements Filter {    @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
             throws IOException, ServletException {
         
         HttpServletResponse response = (HttpServletResponse) res;
         HttpServletRequest request = (HttpServletRequest) req;
+        
+        String origin = request.getHeader("Origin");
         
         // Set CORS headers for all responses
         response.setHeader("Access-Control-Allow-Origin", "*");
@@ -34,6 +34,7 @@ public class GlobalCorsFilter implements Filter {
         // For preflight requests (OPTIONS)
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
             response.setStatus(HttpServletResponse.SC_OK);
+            return; // Return immediately for OPTIONS requests
         } else {
             // Continue with the filter chain for non-OPTIONS requests
             chain.doFilter(req, res);
