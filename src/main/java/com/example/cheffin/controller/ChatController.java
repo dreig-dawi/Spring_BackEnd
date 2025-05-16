@@ -18,16 +18,18 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ChatController {
 
-    private final ChatService chatService;
-
+    private final ChatService chatService;    
     @GetMapping("/conversations")
     public ResponseEntity<List<ConversationDTO>> getConversations(Authentication authentication) {
         try {
             String username = authentication.getName();
+            System.out.println("ChatController: Getting conversations for user: " + username);
             List<ConversationDTO> conversations = chatService.getConversations(username);
+            System.out.println("ChatController: Found " + conversations.size() + " conversations");
             return ResponseEntity.ok(conversations);
         } catch (Exception e) {
             // Log the exception
+            System.err.println("ChatController: Error getting conversations: " + e.getMessage());
             e.printStackTrace();
             // Return an empty list instead of throwing a 500 error
             return ResponseEntity.ok(new ArrayList<>());

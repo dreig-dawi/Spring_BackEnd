@@ -64,43 +64,80 @@ public class ChatService {
             // Return empty list for any unexpected error
             return new ArrayList<>();
         }
-    }
-
-    public List<ConversationDTO> getConversations(String username) {
+    }    public List<ConversationDTO> getConversations(String username) {
         List<ConversationDTO> conversations = new ArrayList<>();
         
         try {
             // Find the current user
             User currentUser = userService.findByUsername(username);
-            if (currentUser == null) {
-                return new ArrayList<>(); // Return empty list if user not found
-            }
+            // User should never be null as findByUsername throws an exception if not found
+            System.out.println("Found user: " + currentUser.getUsername() + " (ID: " + currentUser.getId() + ")");
             
             // Find participants
-            List<User> participants;
+            List<User> participants;            
             try {
-                participants = chatMessageRepository.findConversationParticipants(currentUser);
+                // Get all messages first to check if there are any
+                List<ChatMessage> allMessages = chatMessageRepository.findAll();
+                System.out.println("Total messages in database: " + allMessages.size());
+                if (!allMessages.isEmpty()) {
+                    // Print some examples for debugging
+                    for (int i = 0; i < Math.min(3, allMessages.size()); i++) {
+                        ChatMessage msg = allMessages.get(i);
+                        System.out.println(String.format("Message %d: From %s to %s: %s",
+                            msg.getId(),
+                            msg.getSender().getUsername(),
+                            msg.getRecipient().getUsername(),
+                            msg.getContent().substring(0, Math.min(20, msg.getContent().length())) + "..."));
+                    }
+                }
+                  // Use native SQL query directly instead of the problematic JPQL query
+                // This is more reliable and avoids the ClassCastException
+                System.out.println("Using native SQL query to find conversation participants");
+                List<Long> participantIds = chatMessageRepository.findConversationParticipantIdsByUserId(currentUser.getId());
+                
+                participants = new ArrayList<>();
+                if (participantIds != null && !participantIds.isEmpty()) {
+                    System.out.println("Native query found " + participantIds.size() + " participant IDs");
+                    for (Long id : participantIds) {
+                        try {
+                            User participant = userService.findById(id);
+                            if (participant != null) {
+                                participants.add(participant);
+                            }
+                        } catch (Exception e) {
+                            System.err.println("Could not find user with ID " + id + ": " + e.getMessage());
+                        }
+                    }
+                    System.out.println("Successfully loaded " + participants.size() + " participants from IDs");
+                } else {
+                    System.out.println("No conversation participants found using native query");
+                }
             } catch (Exception e) {
-                // If there's any error with the query, just return an empty list
+                // If there's any error with the query, log it and return an empty list
+                System.err.println("Error finding conversation participants: " + e.getMessage());
+                e.printStackTrace();
                 return new ArrayList<>();
             }
             
             // Initialize conversations list
-            
-            // Process only if we have participants
+              // Process only if we have participants
             if (participants != null && !participants.isEmpty()) {
+                System.out.println("Processing " + participants.size() + " participants to create conversation DTOs");
                 for (User participant : participants) {
                     // Skip null participants
                     if (participant == null) {
+                        System.out.println("Skipping null participant");
                         continue;
                     }
                     
                     try {
+                        System.out.println("Processing conversation with: " + participant.getUsername() + " (ID: " + participant.getId() + ")");
                         // Find conversation messages
                         List<ChatMessage> messages = chatMessageRepository.findConversation(currentUser, participant);
                         
                         // Only process if we have messages
                         if (messages != null && !messages.isEmpty()) {
+                            System.out.println("Found " + messages.size() + " messages with " + participant.getUsername());
                             // Get the most recent message safely
                             ChatMessage lastMessage = messages.get(messages.size() - 1);
                             
@@ -113,15 +150,24 @@ public class ChatService {
                                     .build();
                             
                             conversations.add(conversation);
+                            System.out.println("Added conversation with: " + participant.getUsername());
+                        } else {
+                            System.out.println("No messages found with " + participant.getUsername() + ", skipping conversation");
                         }
                     } catch (Exception e) {
-                        // If we have an issue with one conversation, skip it but don't fail the entire request
+                        // If we have an issue with one conversation, log it and skip it but don't fail the entire request
+                        System.err.println("Error processing conversation with " + participant.getUsername() + ": " + e.getMessage());
                         continue;
-                    }
-                }
+                    }                }
+            } else {
+                System.out.println("No participants found for user: " + currentUser.getUsername());
             }
+            
+            System.out.println("Returning " + conversations.size() + " conversations");
         } catch (Exception e) {
             // Catch any unexpected errors and return an empty list instead of throwing 500
+            System.err.println("Unexpected error in getConversations: " + e.getMessage());
+            e.printStackTrace();
             return new ArrayList<>();
         }
         
