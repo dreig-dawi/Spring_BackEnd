@@ -387,9 +387,52 @@ Gets all unread messages for the current user.
 
 **Response:** Array of chat messages in the same format as the GET /chat/messages/{participantId} endpoint.
 
-### WebSocket Chat
+### Chat Communication
 
-The application uses WebSocket for real-time chat functionality:
+The application supports two methods for chat communication:
+
+#### HTTP Polling (Recommended)
+
+A reliable polling-based approach for chat functionality:
+
+**Send Message Endpoint:** `POST /chat/send`
+
+**Headers:**
+- `Authorization: Bearer {jwt-token}`
+- `Content-Type: application/json`
+
+**Request Body:**
+```json
+{
+  "recipientUsername": "chef123",
+  "content": "Hello, I'd like to book a cooking session"
+}
+```
+
+**Response:**
+```json
+{
+  "id": 3,
+  "senderId": 1,
+  "senderUsername": "user123",
+  "recipientId": 2,
+  "recipientUsername": "chef123",
+  "content": "Hello, I'd like to book a cooking session",
+  "timestamp": "2025-05-13T15:00:00",
+  "read": false
+}
+```
+
+**Recommended Polling Interval:** 10-15 seconds
+
+The client should periodically poll these endpoints to get updated data:
+- `GET /chat/conversations` - For the list of conversations
+- `GET /chat/messages/{participantId}` - For messages in a specific conversation
+- `GET /chat/unread` - For unread messages
+
+#### WebSocket (Legacy Support)
+
+The application also maintains WebSocket support for backward compatibility:
 
 **Connection URL:** `/ws`
 
@@ -407,22 +450,8 @@ The application uses WebSocket for real-time chat functionality:
 **Message Format for Sending:**
 ```json
 {
-  "recipientId": 2,
-  "content": "Hello, I'd like to book a cooking session"
-}
-```
-
-**Message Format for Receiving:**
-```json
-{
-  "id": 3,
-  "senderId": 1,
-  "senderUsername": "user123",
-  "recipientId": 2,
   "recipientUsername": "chef123",
-  "content": "Hello, I'd like to book a cooking session",
-  "timestamp": "2025-05-13T15:00:00",
-  "read": false
+  "content": "Hello, I'd like to book a cooking session"
 }
 ```
 

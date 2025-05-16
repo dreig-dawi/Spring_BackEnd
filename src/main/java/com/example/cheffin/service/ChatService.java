@@ -128,6 +128,17 @@ public class ChatService {
         return conversations;
     }    public ChatMessageDTO saveMessage(String senderUsername, String recipientUsername, String content) {
         try {
+            // Add debug logging
+            System.out.println("Attempting to save message from: " + senderUsername + " to: " + recipientUsername);
+            
+            if (senderUsername == null || senderUsername.trim().isEmpty()) {
+                throw new IllegalArgumentException("Sender username cannot be empty");
+            }
+            
+            if (recipientUsername == null || recipientUsername.trim().isEmpty()) {
+                throw new IllegalArgumentException("Recipient username cannot be empty");
+            }
+            
             User sender = userService.findByUsername(senderUsername);
             if (sender == null) {
                 throw new ResourceNotFoundException("Sender not found: " + senderUsername);
@@ -142,6 +153,7 @@ public class ChatService {
                 throw new IllegalArgumentException("Message content cannot be empty");
             }
 
+            System.out.println("Building chat message...");
             ChatMessage message = ChatMessage.builder()
                     .sender(sender)
                     .recipient(recipient)
@@ -150,13 +162,17 @@ public class ChatService {
                     .read(false)
                     .build();
 
+            System.out.println("Saving message to database...");
             ChatMessage savedMessage = chatMessageRepository.save(message);
+            
             if (savedMessage == null || savedMessage.getId() == null) {
                 throw new RuntimeException("Failed to save message");
             }
             
+            System.out.println("Message saved successfully with ID: " + savedMessage.getId());
             return ChatMessageDTO.fromEntity(savedMessage);
         } catch (Exception e) {
+            System.err.println("Error in saveMessage: " + e.getMessage());
             e.printStackTrace();
             throw e; // Re-throw to be handled by controller or WebSocket error handler
         }
