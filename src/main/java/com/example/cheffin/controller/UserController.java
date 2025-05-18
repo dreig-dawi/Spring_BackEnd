@@ -12,6 +12,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/users")
@@ -56,9 +57,25 @@ public class UserController {
     @GetMapping("/chefs/featured")
     public ResponseEntity<List<UserDTO>> getFeaturedChefs() {
         return ResponseEntity.ok(userService.getFeaturedChefs());
-    }    @GetMapping("/chefs")
+    }    
+    
+    @GetMapping("/chefs")
     public ResponseEntity<List<UserDTO>> getAllChefs() {
         return ResponseEntity.ok(userService.getAllChefs());
+    }
+    
+    @GetMapping("/chefs/search")
+    public ResponseEntity<Map<String, Object>> searchChefs(
+            @RequestParam(required = false) String query,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(userService.searchChefs(query, page, size));
+    }
+    
+    @GetMapping("/chefs/random")
+    public ResponseEntity<List<UserDTO>> getRandomChefs(
+            @RequestParam(defaultValue = "6") int count) {
+        return ResponseEntity.ok(userService.getRandomChefs(count));
     }
     
     @GetMapping("/chef/{username}")

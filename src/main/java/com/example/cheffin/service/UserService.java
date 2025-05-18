@@ -6,14 +6,16 @@ import com.example.cheffin.exception.ResourceNotFoundException;
 import com.example.cheffin.model.User;
 import com.example.cheffin.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -21,7 +23,9 @@ import java.util.stream.Collectors;
 public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;    @Override
+    private final PasswordEncoder passwordEncoder;    
+    
+    @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user;
         
@@ -120,6 +124,46 @@ public class UserService implements UserDetailsService {
 
     public List<UserDTO> getAllChefs() {
         return userRepository.findAllChefs().stream()
+                .map(UserDTO::fromEntity)
+                .collect(Collectors.toList());
+    }
+    
+    public Map<String, Object> searchChefs(String query, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<User> chefPage;
+        
+        if (query != null && !query.trim().isEmpty()) {
+            chefPage = userRepository.searchChefsByKeyword(query.toLowerCase(), pageable);
+        } else {
+            chefPage = userRepository.findAllChefsPageable(pageable);
+        }
+        
+        List<UserDTO> chefs = chefPage.getContent().stream()
+                .map(UserDTO::fromEntity)
+                .collect(Collectors.toList());
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("chefs", chefs);
+        response.put("currentPage", chefPage.getNumber());
+        response.put("totalItems", chefPage.getTotalElements());
+        response.put("totalPages", chefPage.getTotalPages());
+        
+        return response;
+    }
+    
+    public List<UserDTO> getRandomChefs(int count) {
+        List<User> allChefs = userRepository.findAllChefs();
+        
+        // If there are fewer chefs than requested, return all of them
+        if (allChefs.size() <= count) {
+            return allChefs.stream()
+                    .map(UserDTO::fromEntity)
+                    .collect(Collectors.toList());
+        }
+        
+        // Otherwise, select random chefs
+        Collections.shuffle(allChefs);
+        return allChefs.subList(0, count).stream()
                 .map(UserDTO::fromEntity)
                 .collect(Collectors.toList());
     }

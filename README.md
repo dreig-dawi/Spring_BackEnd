@@ -245,6 +245,110 @@ Gets a list of featured chefs.
 ]
 ```
 
+#### `GET /users/chefs`
+Gets all chefs registered in the system.
+
+**Headers:**
+- None required (public endpoint)
+
+**Response:**
+```json
+[
+  {
+    "id": 2,
+    "username": "chef123",
+    "email": "chef@example.com",
+    "profilePicture": "profile.jpg",
+    "role": "CHEF",
+    "specialty": "Italian Cuisine",
+    "bio": "Professional chef with 10 years of experience",
+    "experience": 10,
+    "featured": true
+  },
+  {
+    "id": 3,
+    "username": "chef456",
+    "email": "chef456@example.com",
+    "profilePicture": "another-profile.jpg",
+    "role": "CHEF",
+    "specialty": "French Cuisine",
+    "bio": "Pastry specialist with 5 years of experience",
+    "experience": 5,
+    "featured": false
+  }
+]
+```
+
+#### `GET /users/chefs/search`
+Search for chefs with pagination. Can search by username, specialty, or bio.
+
+**Headers:**
+- None required (public endpoint)
+
+**Query Parameters:**
+- `query` (optional): Search term to filter chefs
+- `page` (optional, default: 0): Page number (zero-based)
+- `size` (optional, default: 10): Number of results per page
+
+**Response:**
+```json
+{
+  "chefs": [
+    {
+      "id": 2,
+      "username": "chef123",
+      "email": "chef@example.com",
+      "profilePicture": "profile.jpg",
+      "role": "CHEF",
+      "specialty": "Italian Cuisine",
+      "bio": "Professional chef with 10 years of experience",
+      "experience": 10,
+      "featured": true
+    }
+  ],
+  "currentPage": 0,
+  "totalItems": 1,
+  "totalPages": 1
+}
+```
+
+#### `GET /users/chefs/random`
+Gets a specified number of random chefs, useful for displaying chef suggestions.
+
+**Headers:**
+- None required (public endpoint)
+
+**Query Parameters:**
+- `count` (optional, default: 6): Number of random chefs to return
+
+**Response:**
+```json
+[
+  {
+    "id": 3,
+    "username": "chef456",
+    "email": "chef456@example.com",
+    "profilePicture": "another-profile.jpg",
+    "role": "CHEF",
+    "specialty": "French Cuisine",
+    "bio": "Pastry specialist with 5 years of experience",
+    "experience": 5,
+    "featured": false
+  },
+  {
+    "id": 2,
+    "username": "chef123",
+    "email": "chef@example.com",
+    "profilePicture": "profile.jpg",
+    "role": "CHEF",
+    "specialty": "Italian Cuisine",
+    "bio": "Professional chef with 10 years of experience",
+    "experience": 10,
+    "featured": true
+  }
+]
+```
+
 ### Posts
 
 #### `GET /post`
