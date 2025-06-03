@@ -8,7 +8,7 @@ import com.example.cheffin.repository.PostRepository;
 import com.example.cheffin.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,6 +21,18 @@ public class PostService {
 
     public List<PostDTO> getAllPosts() {
         return postRepository.findAllByOrderByCreatedAtDesc().stream()
+                .map(PostDTO::fromEntity)
+                .collect(Collectors.toList());
+    }
+
+    public List<PostDTO> getRandomPosts(int count, List<Long> excludeIds) {
+        List<Post> randomPosts;
+        if (excludeIds != null && !excludeIds.isEmpty()) {
+            randomPosts = postRepository.findRandomPostsExcluding(excludeIds, count);
+        } else {
+            randomPosts = postRepository.findRandomPosts(count);
+        }
+        return randomPosts.stream()
                 .map(PostDTO::fromEntity)
                 .collect(Collectors.toList());
     }

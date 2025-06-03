@@ -22,6 +22,7 @@
 /mnt/c/Users/darii/Desktop/FP24-25/Proyecto/Spring_BackEnd/Spring_BackEnd/src/main/java/com/example/cheffin/service/PostService.java
 /mnt/c/Users/darii/Desktop/FP24-25/Proyecto/Spring_BackEnd/Spring_BackEnd/src/main/java/com/example/cheffin/config/GlobalCorsFilter.java
 /mnt/c/Users/darii/Desktop/FP24-25/Proyecto/Spring_BackEnd/Spring_BackEnd/src/main/java/com/example/cheffin/config/WebConfig.java
+/mnt/c/Users/darii/Desktop/FP24-25/Proyecto/Spring_BackEnd/Spring_BackEnd/src/main/java/com/example/cheffin/dto/RandomPostsRequestDTO.java
 /mnt/c/Users/darii/Desktop/FP24-25/Proyecto/Spring_BackEnd/Spring_BackEnd/src/main/java/com/example/cheffin/security/JwtAuthenticationEntryPoint.java
 /mnt/c/Users/darii/Desktop/FP24-25/Proyecto/Spring_BackEnd/Spring_BackEnd/src/main/java/com/example/cheffin/config/PasswordConfig.java
 /mnt/c/Users/darii/Desktop/FP24-25/Proyecto/Spring_BackEnd/Spring_BackEnd/src/main/java/com/example/cheffin/controller/TestController.java

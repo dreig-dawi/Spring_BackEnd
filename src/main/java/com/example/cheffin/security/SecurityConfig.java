@@ -34,7 +34,7 @@ public class SecurityConfig {
                 .requestMatchers("/users/login", "/users/register", "/users/register/chef", 
                                  "/users/profile/*", "/users/chef/*", "/users/chefs/featured", "/users/chefs",
                                  "/users/chefs/search", "/users/chefs/random",
-                                 "/post", "/post/user/*", "/post/search", "/error",
+                                 "/post", "/post/user/*", "/post/search", "/post/random", "/error",
                                  "/api/test/**")
                 .permitAll()
                 // Ensure authenticated access to chat endpoints

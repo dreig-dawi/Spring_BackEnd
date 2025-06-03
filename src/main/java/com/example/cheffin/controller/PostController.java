@@ -52,4 +52,11 @@ public class PostController {
     public ResponseEntity<List<PostDTO>> searchPosts(@RequestParam String query) {
         return ResponseEntity.ok(postService.searchPosts(query));
     }
+
+    @GetMapping("/random")
+    public ResponseEntity<List<PostDTO>> getRandomPosts(
+            @RequestParam(defaultValue = "9") int count,
+            @RequestParam(required = false) List<Long> excludeIds) {
+        return ResponseEntity.ok(postService.getRandomPosts(count, excludeIds));
+    }
 }
